@@ -277,14 +277,24 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
 
   // Jewellery image
   const jewel = JEWEL_LIBRARY.find((j) => j.id === jewelId) ?? JEWEL_LIBRARY[0];
+  // Reserve space for the price block + tagline + footer so the jewel never overlaps them.
+  const priceTop = aspect === "9:16" ? 1280 : 760;
+  const jewelTopY = headingY + (aspect === "9:16" ? 110 : 90);
+  const jewelBottomLimit = priceTop - (aspect === "9:16" ? 80 : 60);
+  const jewelMaxH = Math.max(160, jewelBottomLimit - jewelTopY);
+  const jewelMaxW = aspect === "9:16" ? 620 : 380;
   try {
     const img = await loadImage(jewel.url);
-    const targetW = aspect === "9:16" ? 760 : 480;
     const ratio = img.height / img.width;
-    const drawW = targetW;
-    const drawH = targetW * ratio;
+    // Fit within both width and height constraints (preserve aspect).
+    let drawW = jewelMaxW;
+    let drawH = drawW * ratio;
+    if (drawH > jewelMaxH) {
+      drawH = jewelMaxH;
+      drawW = drawH / ratio;
+    }
     const cx = W / 2;
-    const cy = aspect === "9:16" ? headingY + 130 + drawH / 2 + 30 : headingY + 100 + drawH / 2 + 20;
+    const cy = jewelTopY + drawH / 2;
 
     // soft glow under jewel
     const jg = ctx.createRadialGradient(cx, cy, 20, cx, cy, drawW * 0.7);
@@ -303,8 +313,7 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
     // ignore
   }
 
-  // Price block
-  const priceTop = aspect === "9:16" ? 1200 : 720;
+  // Price block — sit on a translucent panel so numbers stay legible above any imagery
   const priceLabel22 = profile.language === "ta" ? "22K தங்கம்" : "22K GOLD";
   const priceLabel24 = profile.language === "ta" ? "24K தங்கம்" : "24K GOLD";
   const silverLabel = profile.language === "ta" ? "வெள்ளி" : "SILVER";
@@ -312,6 +321,36 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
 
   const colW = (W - 2 * m - 80) / 3;
   const colY = priceTop;
+
+  // Background panel behind prices for contrast
+  const panelPadX = 30;
+  const panelPadTop = aspect === "9:16" ? 60 : 50;
+  const panelPadBottom = aspect === "9:16" ? 70 : 58;
+  const panelX = m + 20;
+  const panelY = colY - panelPadTop;
+  const panelW = W - 2 * (m + 20);
+  const panelH = (aspect === "9:16" ? 170 : 140) + panelPadTop + panelPadBottom - panelPadTop;
+  ctx.save();
+  const panelGrad = ctx.createLinearGradient(0, panelY, 0, panelY + panelH);
+  if (theme === "cream") {
+    panelGrad.addColorStop(0, "rgba(255, 248, 225, 0.55)");
+    panelGrad.addColorStop(1, "rgba(255, 240, 200, 0.35)");
+  } else {
+    panelGrad.addColorStop(0, "rgba(0, 0, 0, 0.45)");
+    panelGrad.addColorStop(1, "rgba(0, 0, 0, 0.30)");
+  }
+  ctx.fillStyle = panelGrad;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 22);
+  ctx.fill();
+  ctx.strokeStyle = t.goldB;
+  ctx.globalAlpha = 0.55;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 22);
+  ctx.stroke();
+  ctx.restore();
+  // suppress unused-var lint while keeping name explicit
+  void panelPadX;
+
   const cols = [
     { label: priceLabel22, value: gold22 },
     { label: priceLabel24, value: gold24 },
