@@ -8,6 +8,9 @@ import {
   Share2,
   Wand2,
   Image as ImageIcon,
+  CloudDownload,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +49,12 @@ function DashboardPage() {
   const [tagline, setTagline] = useState<string>("Gold that grows with you ✨");
   const [poster, setPoster] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [rateStatus, setRateStatus] = useState<
+    | { state: "idle" }
+    | { state: "loading" }
+    | { state: "ok"; fetchedAt: string }
+    | { state: "error"; message: string }
+  >({ state: "idle" });
 
   // redirect to onboarding if no profile
   useEffect(() => {
@@ -56,6 +65,39 @@ function DashboardPage() {
   useEffect(() => {
     if (profile) setTagline(pickTagline(profile.language));
   }, [profile]);
+
+  const fetchLiveRates = async () => {
+    setRateStatus({ state: "loading" });
+    try {
+      const res = await fetch("/api/chennai-rates", { cache: "no-store" });
+      const data = (await res.json()) as {
+        gold22?: number;
+        gold24?: number;
+        silver?: number;
+        fetchedAt?: string;
+        error?: string;
+      };
+      if (!res.ok || data.error || data.gold22 == null) {
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
+      setGold22(formatINR(data.gold22!));
+      setGold24(formatINR(data.gold24!));
+      setSilver(formatINR(data.silver!));
+      setRateStatus({ state: "ok", fetchedAt: data.fetchedAt || new Date().toISOString() });
+    } catch (err) {
+      setRateStatus({
+        state: "error",
+        message: err instanceof Error ? err.message : "Fetch failed",
+      });
+    }
+  };
+
+  // Auto-fetch live Chennai prices once on mount
+  useEffect(() => {
+    if (!ready || !profile) return;
+    fetchLiveRates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, profile?.shopName]);
 
   const today = useMemo(
     () =>
@@ -204,6 +246,44 @@ function DashboardPage() {
       </div>
 
       {/* Prices */}
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">
+          Chennai Live Rates · per gram
+        </p>
+        <button
+          onClick={fetchLiveRates}
+          disabled={rateStatus.state === "loading"}
+          className="flex items-center gap-1 text-[11px] text-primary hover:underline disabled:opacity-50"
+        >
+          <CloudDownload
+            className={`h-3 w-3 ${rateStatus.state === "loading" ? "animate-pulse" : ""}`}
+          />
+          {rateStatus.state === "loading" ? "Fetching…" : "Refresh"}
+        </button>
+      </div>
+      <div className="mb-2 flex items-center gap-1.5 text-[10px] text-muted-foreground">
+        {rateStatus.state === "ok" && (
+          <>
+            <CheckCircle2 className="h-3 w-3 text-primary" />
+            <span>
+              Updated{" "}
+              {new Date(rateStatus.fetchedAt).toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}{" "}
+              · source: goodreturns.in · editable
+            </span>
+          </>
+        )}
+        {rateStatus.state === "error" && (
+          <>
+            <AlertTriangle className="h-3 w-3 text-destructive" />
+            <span>Live fetch failed — enter manually.</span>
+          </>
+        )}
+        {rateStatus.state === "loading" && <span>Fetching live Chennai rates…</span>}
+        {rateStatus.state === "idle" && <span>&nbsp;</span>}
+      </div>
       <div className="mb-4 grid grid-cols-3 gap-2">
         <PriceField label="22K" value={gold22} onChange={setGold22} />
         <PriceField label="24K" value={gold24} onChange={setGold24} />
