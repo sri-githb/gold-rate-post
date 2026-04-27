@@ -28,15 +28,15 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
+      { name: "theme-color", content: "#2a0810" },
+      { title: "SwarnaPost — Daily Gold Rate Posters for Jewellers" },
+      { name: "description", content: "One-tap premium gold rate posters for WhatsApp Status & Instagram. Made for jewellery shop owners." },
+      { name: "author", content: "SwarnaPost" },
+      { property: "og:title", content: "SwarnaPost — Daily Gold Rate Posters" },
+      { property: "og:description", content: "Generate beautiful daily marketing posters in seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
