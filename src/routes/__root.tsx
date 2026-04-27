@@ -33,10 +33,14 @@ export const Route = createRootRoute({
       { title: "SwarnaPost — Daily Gold Rate Posters for Jewellers" },
       { name: "description", content: "One-tap premium gold rate posters for WhatsApp Status & Instagram. Made for jewellery shop owners." },
       { name: "author", content: "SwarnaPost" },
-      { property: "og:title", content: "SwarnaPost — Daily Gold Rate Posters" },
-      { property: "og:description", content: "Generate beautiful daily marketing posters in seconds." },
+      { property: "og:title", content: "SwarnaPost — Daily Gold Rate Posters for Jewellers" },
+      { property: "og:description", content: "One-tap premium gold rate posters for WhatsApp Status & Instagram. Made for jewellery shop owners." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "SwarnaPost — Daily Gold Rate Posters for Jewellers" },
+      { name: "twitter:description", content: "One-tap premium gold rate posters for WhatsApp Status & Instagram. Made for jewellery shop owners." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bb9ab3eb-354d-427b-b48a-333990433fcb/id-preview-51062aef--d1622312-4ebc-454f-b1c0-b3835477a83e.lovable.app-1777287597765.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bb9ab3eb-354d-427b-b48a-333990433fcb/id-preview-51062aef--d1622312-4ebc-454f-b1c0-b3835477a83e.lovable.app-1777287597765.png" },
     ],
     links: [
       {
