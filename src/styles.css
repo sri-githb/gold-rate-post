@@ -1,11 +1,9 @@
 @import "tailwindcss" source(none);
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;700;900&display=swap");
 @source "../src";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
-/* Premium jewellery brand fonts */
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;700;900&display=swap");
 
 /*
  * Design system definition.
