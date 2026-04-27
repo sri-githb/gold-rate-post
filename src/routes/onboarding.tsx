@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Sparkles, Upload, Store, MapPin, Languages, Palette } from "lucide-react";
+import { Upload, Store, MapPin, Languages, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import { saveShopProfile, type LangId, type ThemeId } from "@/lib/shop-store";
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
-      { title: "Setup your shop — SwarnaPost" },
+      { title: "Setup your shop — BSGOLD_POST" },
       { name: "description", content: "Set up your jewellery shop branding in under a minute." },
     ],
   }),
@@ -24,8 +24,9 @@ const THEMES: { id: ThemeId; name: string; preview: string }[] = [
 
 function OnboardingPage() {
   const navigate = useNavigate();
+  const DEFAULT_LOGO_URL = "/assets/app-logo.png";
   const [shopName, setShopName] = useState("");
-  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(DEFAULT_LOGO_URL);
   const [language, setLanguage] = useState<LangId>("en");
   const [location, setLocation] = useState("");
   const [theme, setTheme] = useState<ThemeId>("maroon");
@@ -54,34 +55,25 @@ function OnboardingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col px-5 py-8">
       <header className="mb-6 flex flex-col items-center text-center">
-        <div className="mb-3 rounded-full bg-gradient-gold p-3 shadow-gold-glow">
-          <Sparkles className="h-6 w-6 text-primary-foreground" />
-        </div>
-        <h1 className="font-regal text-2xl text-gold-foil">SWARNAPOST</h1>
+        <img
+          src={logoDataUrl || DEFAULT_LOGO_URL}
+          alt="BSGOLD_POST logo"
+          className="mb-3 h-20 w-20 object-contain shadow-gold-glow"
+        />
+        <h1 className="font-regal text-2xl text-gold-foil">BSGOLD_POST</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Let's set up your shop. Takes 30 seconds.
         </p>
       </header>
 
       <form onSubmit={submit} className="flex flex-col gap-5 rounded-3xl border border-border bg-card/60 p-6 shadow-luxe backdrop-blur">
-        {/* Logo upload */}
-        <div className="flex items-center gap-4">
-          <label
-            htmlFor="logo"
-            className="flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full ring-gold transition hover:opacity-90"
-            style={{ background: "var(--gradient-maroon)" }}
-          >
-            {logoDataUrl ? (
-              <img src={logoDataUrl} alt="logo" className="h-full w-full object-cover" />
-            ) : (
-              <Upload className="h-6 w-6 text-primary" />
-            )}
-          </label>
-          <div className="flex-1">
-            <p className="font-display text-lg text-foreground">Shop Logo</p>
-            <p className="text-xs text-muted-foreground">PNG or JPG, square works best</p>
-            <input id="logo" type="file" accept="image/*" className="hidden" onChange={onLogo} />
-          </div>
+        {/* Optional logo override; default app logo is always preloaded */}
+        <div className="space-y-2">
+          <Label htmlFor="logo" className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+            <Upload className="h-3.5 w-3.5" /> Change Logo (Optional)
+          </Label>
+          <input id="logo" type="file" accept="image/*" onChange={onLogo} className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-2 file:text-xs file:font-medium file:text-primary hover:file:bg-primary/20" />
+          <p className="text-[11px] text-muted-foreground">Default app logo is used automatically if you skip this.</p>
         </div>
 
         {/* Shop name */}

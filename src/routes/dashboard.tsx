@@ -25,12 +25,13 @@ import {
   pickTagline,
   renderPoster,
   type AspectId,
+  type JewelItem,
 } from "@/lib/poster-renderer";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Studio — SwarnaPost" },
+      { title: "Studio — BSGOLD_POST" },
       { name: "description", content: "Generate today's gold rate poster in one tap." },
     ],
   }),
@@ -173,22 +174,18 @@ function DashboardPage() {
     setTagline(taglineOptions[(idx + 1) % taglineOptions.length]);
   };
 
+  const getJewelPreviewSrc = (jewel: JewelItem) => jewel.url || jewel.fallbackUrl || "/assets/jewel-necklace.png";
+
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col px-5 pb-10 pt-6">
       {/* Header */}
       <header className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {profile.logoDataUrl ? (
-            <img
-              src={profile.logoDataUrl}
-              alt=""
-              className="h-11 w-11 rounded-full object-cover ring-gold"
-            />
-          ) : (
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-gold">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
-            </div>
-          )}
+          <img
+            src={profile.logoDataUrl || "/assets/app-logo.png"}
+            alt="Shop logo"
+            className="h-14 w-14 object-contain"
+          />
           <div className="leading-tight">
             <p className="font-display text-lg text-foreground">{profile.shopName}</p>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{today}</p>
@@ -293,19 +290,33 @@ function DashboardPage() {
       {/* Jewel picker */}
       <div className="mb-4">
         <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">Jewellery</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {JEWEL_LIBRARY.map((j) => (
             <button
               key={j.id}
               onClick={() => setJewelId(j.id)}
-              className={`flex flex-col items-center gap-1 rounded-2xl border p-2 transition ${
+              className={`flex min-w-[110px] shrink-0 snap-start flex-col items-center gap-1 rounded-2xl border p-2 transition ${
                 jewelId === j.id ? "border-primary shadow-gold-glow" : "border-border hover:border-primary/40"
               }`}
             >
               <div className="flex h-16 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-maroon">
-                <img src={j.url} alt={j.label} className="h-full w-full object-contain" />
+                <img
+                  src={getJewelPreviewSrc(j)}
+                  alt={j.label}
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (j.fallbackUrl && img.src !== new URL(j.fallbackUrl, window.location.origin).href) {
+                      img.src = j.fallbackUrl;
+                      return;
+                    }
+                    if (img.src !== new URL("/assets/jewel-necklace.png", window.location.origin).href) {
+                      img.src = "/assets/jewel-necklace.png";
+                    }
+                  }}
+                  className="h-full w-full object-contain"
+                />
               </div>
-              <span className="text-[11px] text-muted-foreground">{j.label}</span>
+              <span className="line-clamp-2 text-center text-[11px] text-muted-foreground">{j.label}</span>
             </button>
           ))}
         </div>

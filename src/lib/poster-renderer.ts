@@ -4,10 +4,37 @@ import necklaceUrl from "@/assets/jewel-necklace.png";
 import banglesUrl from "@/assets/jewel-bangles.png";
 import ringUrl from "@/assets/jewel-ring.png";
 
-export const JEWEL_LIBRARY = [
-  { id: "necklace", url: necklaceUrl, label: "Necklace" },
-  { id: "bangles", url: banglesUrl, label: "Bangles" },
-  { id: "ring", url: ringUrl, label: "Ring" },
+export interface JewelItem {
+  id: string;
+  url: string;
+  fallbackUrl?: string;
+  label: string;
+}
+
+export const JEWEL_LIBRARY: JewelItem[] = [
+  { id: "necklace", url: "/assets/jewel-necklace.png", fallbackUrl: necklaceUrl, label: "Necklace" },
+  { id: "bangles", url: "/assets/jewel-bangles.png", fallbackUrl: banglesUrl, label: "Bangles" },
+  { id: "ring", url: "/assets/jewel-ring.png", fallbackUrl: ringUrl, label: "Ring" },
+  { id: "bridal-necklace", url: "/assets/jewel-bridal-necklace.png", fallbackUrl: necklaceUrl, label: "Bridal Necklace" },
+  { id: "choker", url: "/assets/jewel-choker.png", fallbackUrl: necklaceUrl, label: "Choker" },
+  { id: "long-haram", url: "/assets/jewel-long-haram.png", fallbackUrl: necklaceUrl, label: "Long Haram" },
+  { id: "temple-set", url: "/assets/jewel-temple-set.png", fallbackUrl: necklaceUrl, label: "Temple Set" },
+  { id: "mango-mala", url: "/assets/jewel-mango-mala.png", fallbackUrl: necklaceUrl, label: "Mango Mala" },
+  { id: "coin-necklace", url: "/assets/jewel-coin-necklace.png", fallbackUrl: necklaceUrl, label: "Coin Necklace" },
+  { id: "designer-bangles", url: "/assets/jewel-designer-bangles.png", fallbackUrl: banglesUrl, label: "Designer Bangles" },
+  { id: "bridal-bangles", url: "/assets/jewel-bridal-bangles.png", fallbackUrl: banglesUrl, label: "Bridal Bangles" },
+  { id: "kada", url: "/assets/jewel-kada.png", fallbackUrl: banglesUrl, label: "Kada" },
+  { id: "bracelet", url: "/assets/jewel-bracelet.png", fallbackUrl: banglesUrl, label: "Bracelet" },
+  { id: "antique-bangles", url: "/assets/jewel-antique-bangles.png", fallbackUrl: banglesUrl, label: "Antique Bangles" },
+  { id: "daily-ring", url: "/assets/jewel-daily-ring.png", fallbackUrl: ringUrl, label: "Daily Ring" },
+  { id: "engagement-ring", url: "/assets/jewel-engagement-ring.png", fallbackUrl: ringUrl, label: "Engagement Ring" },
+  { id: "stone-ring", url: "/assets/jewel-stone-ring.png", fallbackUrl: ringUrl, label: "Stone Ring" },
+  { id: "cocktail-ring", url: "/assets/jewel-cocktail-ring.png", fallbackUrl: ringUrl, label: "Cocktail Ring" },
+  { id: "kids-ring", url: "/assets/jewel-kids-ring.png", fallbackUrl: ringUrl, label: "Kids Ring" },
+  { id: "wedding-ring", url: "/assets/jewel-wedding-ring.png", fallbackUrl: ringUrl, label: "Wedding Ring" },
+  { id: "premium-necklace", url: "/assets/jewel-premium-necklace.png", fallbackUrl: necklaceUrl, label: "Premium Necklace" },
+  { id: "festive-bangles", url: "/assets/jewel-festive-bangles.png", fallbackUrl: banglesUrl, label: "Festive Bangles" },
+  { id: "luxury-ring", url: "/assets/jewel-luxury-ring.png", fallbackUrl: ringUrl, label: "Luxury Ring" },
 ];
 
 export const TAGLINES_EN = [
@@ -21,7 +48,7 @@ export const TAGLINES_EN = [
 export const TAGLINES_TA = [
   "உங்களுடன் வளரும் தங்கம் ✨",
   "என்றும் நிலையான பேரழகு.",
-  "உங்கள் கதை தங்கத்தில்.",
+  "தலைமுறைகள் பேசும் தங்க நம்பிக்கை.",
   "நினைவுகளுக்காக வடிவமைக்கப்பட்டது.",
   "தூய தங்கம். தூய நம்பிக்கை.",
 ];
@@ -97,6 +124,15 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+async function loadJewelImage(jewel: JewelItem): Promise<HTMLImageElement> {
+  try {
+    return await loadImage(jewel.url);
+  } catch {
+    if (!jewel.fallbackUrl) throw new Error("Jewel image unavailable");
+    return loadImage(jewel.fallbackUrl);
+  }
+}
+
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -114,6 +150,7 @@ function drawGoldText(
   y: number,
   font: string,
   theme: ThemeColors,
+  themeId: ThemeId,
   align: CanvasTextAlign = "center",
 ) {
   ctx.save();
@@ -126,9 +163,16 @@ function drawGoldText(
   grad.addColorStop(0, theme.goldA);
   grad.addColorStop(0.5, theme.goldB);
   grad.addColorStop(1, theme.goldC);
-  ctx.shadowColor = "rgba(0,0,0,0.55)";
-  ctx.shadowBlur = 14;
-  ctx.shadowOffsetY = 3;
+  if (themeId === "cream") {
+    // Cream background needs crisp text without dark halo.
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  } else {
+    ctx.shadowColor = "rgba(0,0,0,0.55)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 3;
+  }
   ctx.fillStyle = grad;
   ctx.fillText(text, x, y);
   ctx.restore();
@@ -205,34 +249,45 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   ctx.restore();
 
   // Header logo + shop name
-  const headerY = aspect === "9:16" ? 180 : 130;
-  if (profile.logoDataUrl) {
-    try {
-      const logo = await loadImage(profile.logoDataUrl);
-      const size = aspect === "9:16" ? 130 : 100;
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(W / 2, headerY, size / 2 + 8, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255,255,255,0.06)";
-      ctx.fill();
-      ctx.strokeStyle = t.goldB;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(W / 2, headerY, size / 2, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(logo, W / 2 - size / 2, headerY - size / 2, size, size);
-      ctx.restore();
-    } catch {
-      // ignore logo load issue
+  // Give the header logo more breathing space from the top border.
+  const headerY = aspect === "9:16" ? 230 : 170;
+  try {
+    const logoSrc = profile.logoDataUrl || "/assets/app-logo.png";
+    const logo = await loadImage(logoSrc);
+    const boxW = aspect === "9:16" ? 250 : 200;
+    const boxH = aspect === "9:16" ? 250 : 200;
+
+    ctx.save();
+    const scale = Math.min(boxW / logo.width, boxH / logo.height);
+    const drawW = logo.width * scale;
+    const drawH = logo.height * scale;
+    if (theme === "cream") {
+      // Keep logo crisp on light cream background.
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+    } else {
+      ctx.shadowColor = "rgba(0,0,0,0.4)";
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetY = 8;
     }
+    ctx.drawImage(logo, W / 2 - drawW / 2, headerY - drawH / 2, drawW, drawH);
+    ctx.restore();
+  } catch {
+    // ignore logo load issue
   }
 
   // Shop name beneath logo
-  const shopY = headerY + (aspect === "9:16" ? 110 : 85);
+  // Keep a cleaner visual gap between logo panel and shop name.
+  const shopY = headerY + (aspect === "9:16" ? 205 : 165);
   ctx.save();
   ctx.font = `600 ${aspect === "9:16" ? 44 : 38}px "Cinzel", serif`;
   ctx.fillStyle = t.subtle;
+  if (theme !== "cream") {
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 2;
+  }
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(profile.shopName.toUpperCase(), W / 2, shopY);
@@ -259,7 +314,15 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   // Heading: Today's Gold Rate
   const headingY = divY + (aspect === "9:16" ? 110 : 90);
   const heading = profile.language === "ta" ? "இன்றைய தங்க விலை" : "TODAY'S GOLD RATE";
-  drawGoldText(ctx, heading, W / 2, headingY, `700 ${aspect === "9:16" ? 78 : 66}px "Cormorant Garamond", serif`, t);
+  drawGoldText(
+    ctx,
+    heading,
+    W / 2,
+    headingY,
+    `700 ${aspect === "9:16" ? 78 : 66}px "Cormorant Garamond", serif`,
+    t,
+    theme,
+  );
 
   // Date line
   const dateStr = new Date().toLocaleDateString(profile.language === "ta" ? "ta-IN" : "en-IN", {
@@ -271,6 +334,11 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   ctx.save();
   ctx.font = `400 ${aspect === "9:16" ? 30 : 26}px "Inter", sans-serif`;
   ctx.fillStyle = t.subtle;
+  if (theme !== "cream") {
+    ctx.shadowColor = "rgba(0,0,0,0.3)";
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetY = 1;
+  }
   ctx.textAlign = "center";
   ctx.fillText(dateStr, W / 2, headingY + (aspect === "9:16" ? 70 : 56));
   ctx.restore();
@@ -284,7 +352,7 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   const jewelMaxH = Math.max(160, jewelBottomLimit - jewelTopY);
   const jewelMaxW = aspect === "9:16" ? 620 : 380;
   try {
-    const img = await loadImage(jewel.url);
+    const img = await loadJewelImage(jewel);
     const ratio = img.height / img.width;
     // Fit within both width and height constraints (preserve aspect).
     let drawW = jewelMaxW;
@@ -365,7 +433,15 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
     ctx.fillText(c.label, x, colY);
     ctx.restore();
 
-    drawGoldText(ctx, `₹${c.value}`, x, colY + (aspect === "9:16" ? 70 : 58), `700 ${aspect === "9:16" ? 72 : 58}px "Cormorant Garamond", serif`, t);
+    drawGoldText(
+      ctx,
+      `₹${c.value}`,
+      x,
+      colY + (aspect === "9:16" ? 70 : 58),
+      `700 ${aspect === "9:16" ? 72 : 58}px "Cormorant Garamond", serif`,
+      t,
+      theme,
+    );
 
     ctx.save();
     ctx.font = `400 ${aspect === "9:16" ? 22 : 18}px "Inter", sans-serif`;
@@ -392,6 +468,11 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   ctx.font = `italic 500 ${aspect === "9:16" ? 40 : 32}px "Cormorant Garamond", serif`;
   const lines = wrapTagline(ctx, tagline, W - 2 * m - 120);
   ctx.fillStyle = t.text;
+  if (theme !== "cream") {
+    ctx.shadowColor = "rgba(0,0,0,0.4)";
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 2;
+  }
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   lines.forEach((ln, i) => {

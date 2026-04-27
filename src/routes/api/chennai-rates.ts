@@ -10,14 +10,6 @@ const corsHeaders = {
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
 
-function parseRupee(text: string): number | null {
-  // matches &#x20b9;14,230 or ₹14,230 or 14,230.50
-  const m = text.match(/(?:&#x20b9;|₹)?\s*([0-9][0-9,]*(?:\.[0-9]+)?)/);
-  if (!m) return null;
-  const n = Number(m[1].replace(/,/g, ""));
-  return Number.isFinite(n) ? n : null;
-}
-
 async function fetchHtml(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: { "User-Agent": UA, Accept: "text/html" },
@@ -33,7 +25,9 @@ function extract(html: string, idAttr: string): number | null {
     "i",
   );
   const m = html.match(re);
-  return m ? parseRupee(m[0]) : null;
+  if (!m?.[1]) return null;
+  const n = Number(m[1].replace(/,/g, ""));
+  return Number.isFinite(n) ? n : null;
 }
 
 export const Route = createFileRoute("/api/chennai-rates")({

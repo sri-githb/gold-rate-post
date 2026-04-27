@@ -21,7 +21,7 @@ function Index() {
         <div className="rounded-full bg-gradient-gold p-4 shadow-gold-glow">
           <Sparkles className="h-8 w-8 text-primary-foreground" />
         </div>
-        <h1 className="font-regal text-3xl text-gold-foil">SwarnaPost</h1>
+        <h1 className="font-regal text-3xl text-gold-foil">BSGOLD_POST</h1>
         <p className="text-sm text-muted-foreground">Loading your studio…</p>
       </div>
     </div>
