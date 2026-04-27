@@ -397,3 +397,10 @@ function PriceField({
     </div>
   );
 }
+
+function formatINR(n: number): string {
+  // Indian grouping (e.g. 1,45,230)
+  return new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: n < 100 ? 2 : 0,
+  }).format(n);
+}
