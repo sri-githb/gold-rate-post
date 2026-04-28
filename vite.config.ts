@@ -13,10 +13,12 @@ export default defineConfig({
       {
         name: 'disable-componentTagger',
         configResolved(config) {
-          const plugins = config.plugins as Array<{ name: string }>;
-          const index = plugins.findIndex(plugin => plugin.name === 'component-tagger');
-          if (index !== -1) {
-            plugins.splice(index, 1);
+          const componentTaggerPlugin = config.plugins.find(
+            plugin => plugin.name === 'component-tagger'
+          );
+          if (componentTaggerPlugin) {
+            const index = config.plugins.indexOf(componentTaggerPlugin);
+            config.plugins.splice(index, 1);
           }
         }
       }

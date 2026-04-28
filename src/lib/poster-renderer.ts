@@ -438,7 +438,7 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
       `₹${c.value}`,
       x,
       colY + (aspect === "9:16" ? 70 : 58),
-      `700 ${aspect === "9:16" ? 78 : 62}px "Playfair Display", "Cormorant Garamond", serif`,
+      `700 ${aspect === "9:16" ? 72 : 58}px "Cormorant Garamond", serif`,
       t,
       theme,
     );
