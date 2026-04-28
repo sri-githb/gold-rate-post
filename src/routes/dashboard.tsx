@@ -385,12 +385,12 @@ function PriceField({
     <div className="rounded-2xl border border-border bg-card/40 p-3">
       <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</Label>
       <div className="mt-1 flex items-baseline gap-1">
-        <span className="font-display text-lg text-primary">₹</span>
+        <span className="text-base font-semibold text-primary">₹</span>
         <input
           value={value}
           onChange={(e) => onChange(e.target.value.slice(0, 10))}
           inputMode="decimal"
-          className="w-full bg-transparent font-display text-xl text-foreground outline-none"
+          className="w-full bg-transparent text-xl font-semibold tracking-tight text-foreground outline-none tabular-nums"
         />
       </div>
     </div>
