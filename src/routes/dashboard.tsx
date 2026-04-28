@@ -200,21 +200,9 @@ function DashboardPage() {
         </button>
       </header>
 
-      {/* Aspect toggle */}
-      <div className="mb-4 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-card/40 p-1">
-        {(["9:16", "1:1"] as AspectId[]).map((a) => (
-          <button
-            key={a}
-            onClick={() => setAspect(a)}
-            className={`rounded-xl py-2 text-xs font-medium transition ${
-              aspect === a
-                ? "bg-gradient-gold text-primary-foreground shadow-gold-glow"
-                : "text-muted-foreground"
-            }`}
-          >
-            {a === "9:16" ? "WhatsApp Status (9:16)" : "Instagram Post (1:1)"}
-          </button>
-        ))}
+      {/* Aspect (fixed) */}
+      <div className="mb-4 rounded-2xl border border-border bg-card/40 p-2 text-center text-xs font-medium text-primary">
+        WhatsApp Status (9:16)
       </div>
 
       {/* Preview */}

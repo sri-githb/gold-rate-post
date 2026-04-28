@@ -25,10 +25,10 @@ const THEMES: { id: ThemeId; name: string; preview: string }[] = [
 function OnboardingPage() {
   const navigate = useNavigate();
   const DEFAULT_LOGO_URL = "/assets/app-logo.png";
-  const [shopName, setShopName] = useState("");
+  const [shopName, setShopName] = useState("BS Gold & Bankers");
   const [logoDataUrl, setLogoDataUrl] = useState<string | null>(DEFAULT_LOGO_URL);
   const [language, setLanguage] = useState<LangId>("en");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("Vellore");
   const [theme, setTheme] = useState<ThemeId>("maroon");
 
   const onLogo = (e: ChangeEvent<HTMLInputElement>) => {
