@@ -314,12 +314,20 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   // Heading: Today's Gold Rate
   const headingY = divY + (aspect === "9:16" ? 110 : 90);
   const heading = profile.language === "ta" ? "இன்றைய தங்க விலை" : "TODAY'S GOLD RATE";
+  const headingMaxWidth = W - 2 * m - 120;
+  let headingSize = aspect === "9:16" ? 78 : 66;
+  const headingMinSize = aspect === "9:16" ? 50 : 42;
+  while (headingSize > headingMinSize) {
+    ctx.font = `700 ${headingSize}px "Cormorant Garamond", serif`;
+    if (ctx.measureText(heading).width <= headingMaxWidth) break;
+    headingSize -= 2;
+  }
   drawGoldText(
     ctx,
     heading,
     W / 2,
     headingY,
-    `700 ${aspect === "9:16" ? 78 : 66}px "Cormorant Garamond", serif`,
+    `700 ${headingSize}px "Cormorant Garamond", serif`,
     t,
     theme,
   );
@@ -438,7 +446,8 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
       `₹${c.value}`,
       x,
       colY + (aspect === "9:16" ? 70 : 58),
-      `700 ${aspect === "9:16" ? 72 : 58}px "Cormorant Garamond", serif`,
+      // Cinzel gives cleaner, more even luxury numerals than Cormorant's old-style digits.
+      `700 ${aspect === "9:16" ? 60 : 50}px "Cinzel", serif`,
       t,
       theme,
     );
@@ -465,7 +474,7 @@ export async function renderPoster(inputs: PosterInputs): Promise<string> {
   // Tagline
   const tagY = priceTop + (aspect === "9:16" ? 240 : 200);
   ctx.save();
-  ctx.font = `italic 500 ${aspect === "9:16" ? 40 : 32}px "Cormorant Garamond", serif`;
+  ctx.font = `italic 500 ${aspect === "9:16" ? 34 : 28}px "Cormorant Garamond", serif`;
   const lines = wrapTagline(ctx, tagline, W - 2 * m - 120);
   ctx.fillStyle = t.text;
   if (theme !== "cream") {
