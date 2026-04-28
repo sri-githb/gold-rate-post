@@ -13,15 +13,11 @@ export default defineConfig({
       {
         name: 'disable-componentTagger',
         configResolved(config) {
-          const componentTaggerPlugin = config.plugins.find(
-            plugin => plugin.name === 'component-tagger'
-          );
-          if (componentTaggerPlugin) {
-            const index = config.plugins.indexOf(componentTaggerPlugin);
-            config.plugins.splice(index, 1);
-          }
-        }
-      }
+          const plugins = config.plugins as unknown as Array<{ name: string }>;
+          const idx = plugins.findIndex((p) => p.name === 'component-tagger');
+          if (idx !== -1) plugins.splice(idx, 1);
+        },
+      },
     ]
   }
 });
